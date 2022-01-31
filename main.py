@@ -46,9 +46,22 @@ def check_columns(board, player):
     return False
 
 
+def check_slants(board, player):
+    if len(board) % 2 == 0:
+        return False
+    slant1 = 0
+    slant2 = 0
+    for i in range(len(board)):
+        slant1 += board[i][i] == player
+        slant2 += board[i][len(board)-i-1] == player
+    if(slant1 == len(board) or slant2 == len(board)):
+        return True
+    return False
+
+
 def won(player: Player, board: Board) -> bool:
     player = X if player == O else X
-    return check_rows(board, player) or check_columns(board, player)
+    return check_rows(board, player) or check_columns(board, player) or check_slants(board, player)
 
 
 def update_board(board: Board, player: Player, coords: Coords):
@@ -69,7 +82,8 @@ def get_move(player: Player) -> Coords:
     :param player: the player whose turn it is to play
     :return: the coordinates the player chose
     """
-    row, col = list(input(f"{player}'s move: "))
+    myInput = input(f"{player}'s move: ")
+    row, col = list(myInput) if len(myInput) < 3 else [-1, -1]
     return int(row), int(col)
 
 
@@ -115,6 +129,8 @@ def play_game(board_size: int = None):
     while not won(current_player, board):
         show_board(board)
         coordinates = get_move(current_player)
+        if(coordinates[0] < 0 or coordinates[0] >= len(board) or coordinates[1] < 0 or coordinates[1] >= len(board)):
+            continue
         if board[coordinates[0]][coordinates[1]] != "*":
             continue
         update_board(board, current_player, coordinates)
